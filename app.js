@@ -70,6 +70,22 @@
     return optionId;
   }
 
+  /* Bild einer Option nach INTERFACES §1 D.2: Trägt ihre Frage bildJe, gehen die Optionen
+   * der bildJe-Frage in ihrer Reihenfolge in fragen.js durch; die ERSTE gewählte, für die
+   * option.bilder einen Eintrag hat, bestimmt das Bild. Keine passt → option.bild.
+   * Gilt für die Kachel und für das Moodboard im Stilprofil. */
+  function bildFuer(frage, option) {
+    if (!frage.bildJe || !option.bilder) return option.bild;
+    var quelle = frageNachId(frage.bildJe);
+    if (!quelle) return option.bild;
+    var gewaehlt = zustand.antworten[quelle.id].gewaehlt;
+    for (var i = 0; i < quelle.optionen.length; i++) {
+      var q = quelle.optionen[i];
+      if (gewaehlt.indexOf(q.id) >= 0 && option.bilder[q.id]) return option.bilder[q.id];
+    }
+    return option.bild;
+  }
+
   /* ---------- Zustand ---------- */
 
   var zustand = {
@@ -85,6 +101,7 @@
   var wurzel = document.getElementById("wurzel");
   var startBereich, interviewBereich, profilBereich;
   var frageArtikel = [];
+  var kachelBilder = {}; /* frageId → Liste von { img, option }: Kachelbilder, die von bildJe abhängen */
   var fortschrittText, fortschrittBalken;
   var zurueckKnopf, weiterKnopf;
   var kundenFeld, kiFeld;
@@ -337,11 +354,15 @@
     frage.optionen.forEach(function (option) {
       var kachel;
       if (frage.typ === "bild") {
+        var kachelBild = el("img", { klasse: "kachel-bild", src: bildFuer(frage, option), alt: option.label });
+        if (frage.bildJe) {
+          (kachelBilder[frage.id] = kachelBilder[frage.id] || []).push({ img: kachelBild, option: option });
+        }
         kachel = el("button", {
           klasse: "kachel kachel-typ-bild", testid: "option", type: "button",
           "data-option-id": option.id, "aria-pressed": "false"
         },
-          el("img", { klasse: "kachel-bild", src: option.bild, alt: option.label }),
+          kachelBild,
           el("span", { klasse: "kachel-name", text: option.label }),
           el("span", { klasse: "kachel-haekchen", html: SVG_HAEKCHEN, "aria-hidden": "true" })
         );
@@ -382,6 +403,16 @@
 
   /* ---------- Anzeige steuern ---------- */
 
+  /* bildJe-Bilder der Frage auf den Stand der Antworten bringen (D.2) — nach „Zurück"
+   * und geändertem Raum zeigen die Kacheln beim Anzeigen das passende Bild. */
+  function aktualisiereBildJe(frage) {
+    if (!frage || !frage.bildJe) return;
+    (kachelBilder[frage.id] || []).forEach(function (eintrag) {
+      var pfad = bildFuer(frage, eintrag.option);
+      if (eintrag.img.getAttribute("src") !== pfad) eintrag.img.setAttribute("src", pfad);
+    });
+  }
+
   function zeigeFrage() {
     aufnahmeStoppen();
     startBereich.hidden = true;
@@ -390,6 +421,7 @@
     frageArtikel.forEach(function (artikel, index) {
       artikel.hidden = index !== zustand.schritt;
     });
+    aktualisiereBildJe(fragen[zustand.schritt]);
     fortschrittText.textContent = "Frage " + (zustand.schritt + 1) + " von " + fragen.length;
     fortschrittBalken.style.width = ((zustand.schritt + 1) / fragen.length * 100) + "%";
     zurueckKnopf.disabled = zustand.schritt === 0;
@@ -450,7 +482,7 @@
     fragen.forEach(function (frage) {
       var gewaehlt = gewaehlteOptionen(frage);
       if (frage.typ === "bild") {
-        gewaehlt.forEach(function (option) { fotos.push(option); });
+        gewaehlt.forEach(function (option) { fotos.push({ frage: frage, option: option }); });
       } else if (frage.typ === "farbe") {
         gewaehlt.forEach(function (option) { baender.push(option); });
       } else if (frage.id === "gefuehl") {
@@ -459,12 +491,12 @@
     });
 
     var collage = el("div", { klasse: "collage" });
-    fotos.forEach(function (option, index) {
+    fotos.forEach(function (eintrag, index) {
       var klasse = "collage-foto";
       if (fotos.length === 1) klasse += " breit";
       else if (index % 2 === 1) klasse += " rechts";
       collage.appendChild(el("figure", { klasse: klasse },
-        el("img", { src: option.bild, alt: option.label })));
+        el("img", { src: bildFuer(eintrag.frage, eintrag.option), alt: eintrag.option.label })));
     });
     baender.forEach(function (option) {
       var streifen = el("span", { klasse: "streifen", "aria-hidden": "true" });

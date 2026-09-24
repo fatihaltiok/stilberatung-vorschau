@@ -9,6 +9,10 @@
  *   "text"  — keine Kacheln, nur das Notizfeld
  * mehrfach: true = mehrere Kacheln wählbar; max = höchstens so viele (fehlt = unbegrenzt).
  * notiz: true = Notizfeld (tippen oder einsprechen) unter den Kacheln; notizHinweis = Platzhalter.
+ * bildJe: "<frage-id>" (nur Typ "bild") = das Bild jeder Option hängt von der Antwort auf jene Frage ab:
+ *   deren Optionen werden in ihrer Reihenfolge durchgegangen; die ERSTE gewählte, für die
+ *   option.bilder[<ihre id>] existiert, bestimmt das Bild. Keine passt → option.bild.
+ *   Gilt für die Kachel UND für das Moodboard im Stilprofil (INTERFACES §1 D.2).
  * Keine Frage ist Pflicht — „Weiter" geht immer.
  */
 window.INTERVIEW = {
@@ -41,16 +45,28 @@ window.INTERVIEW = {
       notiz: true, notizHinweis: "Was genau soll anders werden?"
     },
     {
-      id: "stil", typ: "bild", mehrfach: true, max: 2,
+      id: "stil", typ: "bild", mehrfach: true, max: 2, bildJe: "raum",
       frage: "Welche Räume gefallen Ihnen?",
       hilfe: "Bis zu zwei Bilder. Aus dem Bauch heraus.",
       optionen: [
-        { id: "modern", label: "Klar und modern", bild: "bilder/stil-modern.jpg" },
-        { id: "skandinavisch", label: "Hell und skandinavisch", bild: "bilder/stil-skandinavisch.jpg" },
-        { id: "mediterran", label: "Warm und mediterran", bild: "bilder/stil-mediterran.jpg" },
-        { id: "klassisch", label: "Klassisch und elegant", bild: "bilder/stil-klassisch.jpg" },
-        { id: "natuerlich", label: "Natürlich und verspielt", bild: "bilder/stil-natuerlich.jpg" },
-        { id: "loft", label: "Loft mit Charakter", bild: "bilder/stil-loft.jpg" }
+        { id: "modern", label: "Klar und modern", bild: "bilder/stil-modern.jpg",
+          bilder: { wohnzimmer: "bilder/stil-modern.jpg", essbereich: "bilder/stil-modern-essbereich.jpg", schlafzimmer: "bilder/stil-modern-schlafzimmer.jpg",
+                    arbeitszimmer: "bilder/stil-modern-arbeitszimmer.jpg", flur: "bilder/stil-modern-flur.jpg" } },
+        { id: "skandinavisch", label: "Hell und skandinavisch", bild: "bilder/stil-skandinavisch.jpg",
+          bilder: { wohnzimmer: "bilder/stil-skandinavisch.jpg", essbereich: "bilder/stil-skandinavisch-essbereich.jpg", schlafzimmer: "bilder/stil-skandinavisch-schlafzimmer.jpg",
+                    arbeitszimmer: "bilder/stil-skandinavisch-arbeitszimmer.jpg", flur: "bilder/stil-skandinavisch-flur.jpg" } },
+        { id: "mediterran", label: "Warm und mediterran", bild: "bilder/stil-mediterran.jpg",
+          bilder: { wohnzimmer: "bilder/stil-mediterran.jpg", essbereich: "bilder/stil-mediterran-essbereich.jpg", schlafzimmer: "bilder/stil-mediterran-schlafzimmer.jpg",
+                    arbeitszimmer: "bilder/stil-mediterran-arbeitszimmer.jpg", flur: "bilder/stil-mediterran-flur.jpg" } },
+        { id: "klassisch", label: "Klassisch und elegant", bild: "bilder/stil-klassisch.jpg",
+          bilder: { wohnzimmer: "bilder/stil-klassisch.jpg", essbereich: "bilder/stil-klassisch-essbereich.jpg", schlafzimmer: "bilder/stil-klassisch-schlafzimmer.jpg",
+                    arbeitszimmer: "bilder/stil-klassisch-arbeitszimmer.jpg", flur: "bilder/stil-klassisch-flur.jpg" } },
+        { id: "natuerlich", label: "Natürlich und verspielt", bild: "bilder/stil-natuerlich.jpg",
+          bilder: { wohnzimmer: "bilder/stil-natuerlich.jpg", essbereich: "bilder/stil-natuerlich-essbereich.jpg", schlafzimmer: "bilder/stil-natuerlich-schlafzimmer.jpg",
+                    arbeitszimmer: "bilder/stil-natuerlich-arbeitszimmer.jpg", flur: "bilder/stil-natuerlich-flur.jpg" } },
+        { id: "loft", label: "Loft mit Charakter", bild: "bilder/stil-loft.jpg",
+          bilder: { wohnzimmer: "bilder/stil-loft.jpg", essbereich: "bilder/stil-loft-essbereich.jpg", schlafzimmer: "bilder/stil-loft-schlafzimmer.jpg",
+                    arbeitszimmer: "bilder/stil-loft-arbeitszimmer.jpg", flur: "bilder/stil-loft-flur.jpg" } }
       ],
       notiz: true, notizHinweis: "Was gefällt Ihnen daran besonders?"
     },
