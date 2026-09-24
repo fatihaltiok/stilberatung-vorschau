@@ -1,0 +1,648 @@
+/*
+ * Stil-Interview — Gestaltung (Auftrag IA-1).
+ * Markenfarben der Sofa-&-Co.-Webseite, Schriften Cormorant Garamond und Jost —
+ * beides nur lokal aus muster/fonts/. Kühnheit nur im Moodboard, alles andere still.
+ * Keine Verläufe, keine Großbuchstaben-Beschriftungen, keine Schatten-Karten.
+ */
+
+@font-face {
+  font-family: "Cormorant Garamond";
+  src: url("fonts/cormorant-garamond-normal-400.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Cormorant Garamond";
+  src: url("fonts/cormorant-garamond-italic-400.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Cormorant Garamond";
+  src: url("fonts/cormorant-garamond-normal-500.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Jost";
+  src: url("fonts/jost-300.woff2") format("woff2");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Jost";
+  src: url("fonts/jost-400.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Jost";
+  src: url("fonts/jost-500.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --papier: #FFFFFF;
+  --zart: #F7F4EF;
+  --tinte: #26221C;
+  --gold: #9A7B4F;
+  --gold-hell: #C9A876;
+  --grau: #6E6558;
+  --linie: #E7E0D3;
+  --linie-stark: #D6CCBC;
+  --serif: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  --ohne: "Jost", "Segoe UI", Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--papier);
+  color: var(--tinte);
+  font-family: var(--ohne);
+  font-size: 1.0625rem;
+  font-weight: 400;
+  line-height: 1.55;
+}
+
+[hidden] { display: none !important; }
+
+h1, h2, h3 {
+  font-family: var(--serif);
+  font-weight: 500;
+  line-height: 1.12;
+  margin: 0;
+}
+p { margin: 0; }
+figure { margin: 0; }
+img { max-width: 100%; }
+button { font: inherit; color: inherit; }
+textarea { font: inherit; }
+
+:focus {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+/* Nur-Zielscheiben des programmatischen Fokus (nach Frage- oder Profilwechsel):
+   kein Ring um die ganze Überschrift — Kacheln und Knöpfe behalten ihn */
+.frage-titel:focus, .profil-kopf h2:focus { outline: none; }
+
+/* ---------- Knöpfe ---------- */
+
+.knopf {
+  cursor: pointer;
+  border: 1px solid var(--gold);
+  border-radius: 3px;
+  background: var(--gold-hell);
+  color: var(--tinte);
+  font-weight: 500;
+  padding: 0.72rem 1.5rem;
+  transition: background-color 0.15s ease;
+}
+.knopf:hover { background: #D8BC8E; }
+.knopf:disabled {
+  cursor: default;
+  background: transparent;
+  border-color: var(--linie-stark);
+  color: var(--grau);
+}
+
+.textknopf {
+  cursor: pointer;
+  border: none;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--grau);
+  padding: 0.72rem 0.9rem;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 4px;
+  transition: color 0.15s ease, text-decoration-color 0.15s ease;
+}
+.textknopf:hover {
+  color: var(--tinte);
+  text-decoration-color: var(--gold-hell);
+}
+.textknopf:disabled {
+  cursor: default;
+  color: var(--linie-stark);
+  text-decoration: none;
+}
+
+/* ---------- Start ---------- */
+
+.start {
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  max-width: 34rem;
+  margin: 0 auto;
+  padding: clamp(2.5rem, 7vh, 4.5rem) 1.4rem 3rem;
+}
+.start-marke {
+  display: block;
+  width: 9.4rem;
+  height: auto;
+  margin-bottom: 2.2rem;
+}
+.start h1 {
+  font-size: clamp(3rem, 9vw, 4.6rem);
+  margin-bottom: 0.9rem;
+}
+.start-intro {
+  color: var(--grau);
+  font-weight: 300;
+  font-size: 1.12rem;
+  max-width: 30rem;
+}
+.start-formular {
+  margin-top: 2.2rem;
+  background: var(--zart);
+  border-radius: 8px;
+  padding: 1.6rem;
+}
+.feld-label {
+  display: block;
+  font-weight: 500;
+  font-size: 0.95rem;
+  margin-bottom: 0.4rem;
+}
+.feld-input {
+  width: 100%;
+  font: inherit;
+  font-weight: 300;
+  color: var(--tinte);
+  background: var(--papier);
+  border: 1px solid var(--linie-stark);
+  border-radius: 3px;
+  padding: 0.7rem 0.8rem;
+}
+.feld-input:focus { border-color: var(--gold); }
+.start-datum {
+  margin-top: 1rem;
+  color: var(--grau);
+  font-size: 0.95rem;
+}
+.start-aktion { margin-top: 1.4rem; }
+.start-hinweis {
+  margin-top: 1.1rem;
+  color: var(--grau);
+  font-size: 0.9rem;
+}
+
+/* ---------- Interview ---------- */
+
+.interview {
+  max-width: 78rem;
+  margin: 0 auto;
+  padding: clamp(1.2rem, 3vh, 2.4rem) clamp(1.1rem, 4vw, 3rem) 7.5rem;
+}
+.fortschritt-text {
+  display: block;
+  color: var(--grau);
+  font-size: 0.95rem;
+}
+.fortschritt-linie {
+  height: 2px;
+  margin-top: 0.55rem;
+  background: var(--zart);
+  border-radius: 1px;
+  overflow: hidden;
+  margin-bottom: clamp(1.5rem, 4vh, 2.8rem);
+}
+.fortschritt-linie span {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: var(--gold-hell);
+  transition: width 0.3s ease;
+}
+
+.frage-ansicht {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(1.8rem, 4vw, 2.5rem);
+  align-items: start;
+}
+@media (min-width: 900px) {
+  .frage-ansicht {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    column-gap: clamp(2.5rem, 4.5vw, 4.5rem);
+    row-gap: 0;
+    grid-template-rows: auto 1fr;
+  }
+  /* Querformat: links Frage + Hilfesatz + Notizfeld, rechts die Kacheln (Vertrag §G) */
+  .frage-links { grid-column: 1; grid-row: 1; }
+  .frage-ansicht > .kacheln { grid-column: 2; grid-row: 1 / span 2; }
+  .frage-ansicht > .notiz { grid-column: 1; grid-row: 2; margin-top: 1.9rem; }
+}
+.frage-ansicht.ohne-kacheln .frage-links { max-width: 40rem; }
+
+.frage-titel {
+  font-size: clamp(2rem, 3.4vw, 3.1rem);
+  text-wrap: balance;
+  margin-bottom: 0.6rem;
+}
+.frage-hilfe {
+  color: var(--grau);
+  font-weight: 300;
+  font-size: 1.08rem;
+  max-width: 26rem;
+}
+
+/* Notizfeld und Einsprechen */
+
+.notiz {
+  max-width: 26rem; /* Abstand oben: Rasterlücke; im Querformat margin-top in der 900px-Regel */
+}
+.notiz-label {
+  display: block;
+  font-weight: 500;
+  font-size: 0.95rem;
+  margin-bottom: 0.4rem;
+}
+.notiz-feld {
+  width: 100%;
+  min-height: 5.4rem;
+  font-weight: 300;
+  color: var(--tinte);
+  background: var(--papier);
+  border: 1px solid var(--linie-stark);
+  border-radius: 3px;
+  padding: 0.7rem 0.8rem;
+  resize: vertical;
+}
+.notiz-feld:focus { border-color: var(--gold); }
+.notiz-feld::placeholder {
+  color: var(--grau);
+  opacity: 0.9;
+}
+.einsprech-zeile {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-top: 0.75rem;
+}
+.sprech-knopf {
+  flex: none;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  border: 1.5px solid var(--gold);
+  background: var(--papier);
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.sprech-knopf svg { width: 1.35rem; height: 1.35rem; }
+.sprech-knopf:hover { background: var(--zart); }
+.sprech-knopf.nimmt-auf {
+  background: var(--tinte);
+  border-color: var(--tinte);
+  color: var(--papier);
+}
+.sprech-status {
+  color: var(--grau);
+  font-size: 0.92rem;
+  line-height: 1.4;
+}
+
+/* Kacheln */
+
+.kacheln {
+  display: grid;
+  gap: clamp(0.8rem, 1.6vw, 1.1rem);
+  align-content: start;
+}
+.kacheln-typ-bild { grid-template-columns: repeat(auto-fill, minmax(min(9rem, 100%), 1fr)); }
+.kacheln-typ-farbe { grid-template-columns: repeat(auto-fill, minmax(min(11.5rem, 100%), 1fr)); }
+.kacheln-typ-wahl { grid-template-columns: repeat(auto-fill, minmax(min(13rem, 100%), 1fr)); }
+
+.kachel {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+  background: var(--papier);
+  border: 1px solid var(--linie);
+  border-radius: 6px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+}
+.kachel:hover { border-color: var(--gold); }
+
+.kachel-bild {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+.kachel-name {
+  display: block;
+  padding: 0.62rem 0.85rem 0.7rem;
+  font-size: 0.95rem;
+  line-height: 1.35;
+}
+.streifen {
+  display: flex;
+  height: 4.2rem;
+}
+.streifen span { flex: 1; }
+
+.kachel-typ-wahl .kachel-text {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  min-height: 4rem;
+  padding: 0.9rem 1rem;
+}
+
+/* Ausgewählt: goldener Rahmen nach innen plus Häkchen (Bild, Farbe),
+   dunkle Füllung mit hellem Text (Wahl) */
+.kachel[aria-pressed="true"] { border-color: var(--gold); }
+.kachel[aria-pressed="true"]::after {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border: 2px solid var(--gold);
+  border-radius: 3px;
+  pointer-events: none;
+}
+.kachel-typ-wahl[aria-pressed="true"] {
+  background: var(--tinte);
+  border-color: var(--tinte);
+  color: var(--zart);
+}
+.kachel-haekchen {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: var(--gold);
+  color: #FFFFFF;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.kachel-haekchen svg { width: 0.8rem; height: 0.8rem; }
+.kachel[aria-pressed="true"] .kachel-haekchen { display: flex; }
+.kachel-haken {
+  display: none;
+  flex: none;
+  width: 1.1rem;
+  height: 1.1rem;
+  color: var(--gold-hell);
+}
+.kachel-typ-wahl[aria-pressed="true"] .kachel-haken { display: block; }
+
+.max-hinweis {
+  grid-column: 1 / -1;
+  font-size: 0.95rem;
+  visibility: hidden;
+}
+.max-hinweis.da { visibility: visible; }
+
+/* Sanfter Wechsel zwischen den Fragen — nur als Antwort auf Handlung */
+.frage { animation: frage-kommt 0.26s ease-out; }
+@keyframes frage-kommt {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Feste Leiste unten */
+.unere-leiste {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.7rem clamp(1.1rem, 4vw, 3rem) calc(0.7rem + env(safe-area-inset-bottom, 0rem));
+  background: rgba(255, 255, 255, 0.97);
+  border-top: 1px solid var(--linie);
+}
+
+/* ---------- Stilprofil ---------- */
+
+.profil-kopf {
+  max-width: 62rem;
+  margin: 0 auto;
+  padding: clamp(2rem, 6vh, 3.5rem) clamp(1.1rem, 4vw, 3rem) 1.6rem;
+}
+.profil-kopf h2 { font-size: clamp(2.4rem, 5vw, 3.8rem); }
+.profil-datum {
+  margin-top: 0.4rem;
+  color: var(--grau);
+  font-weight: 300;
+}
+
+/* Die eine kühne Stelle: das Moodboard */
+.pinnwand {
+  background: var(--zart);
+  border-top: 1px solid var(--linie);
+  border-bottom: 1px solid var(--linie);
+  padding: clamp(1.2rem, 3.5vw, 2.6rem) clamp(1.1rem, 4vw, 3rem);
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.pinnwand-inhalt { max-width: 62rem; margin: 0 auto; }
+.handschrift {
+  display: block;
+  width: clamp(11rem, 26vw, 17rem);
+  height: auto;
+  margin: 0 0 0.6rem auto;
+  transform: rotate(-2deg);
+  mix-blend-mode: multiply;
+}
+.collage {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: clamp(0.7rem, 1.4vw, 1rem);
+}
+.collage-foto {
+  grid-column: span 7;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.collage-foto.rechts { grid-column: span 5; }
+.collage-foto.breit { grid-column: 1 / -1; }
+.collage-foto img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+.collage-foto.breit img { aspect-ratio: 16 / 9; }
+.collage-band { grid-column: 1 / -1; margin-top: 0.4rem; }
+.collage-band .streifen {
+  height: 3.4rem;
+  border: 1px solid var(--linie);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.collage-band-name {
+  display: block;
+  margin: 0.45rem 0 0 0.1rem;
+  color: var(--grau);
+  font-size: 0.95rem;
+}
+.collage-gefuehle {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: clamp(1.4rem, 4vw, 3rem);
+  row-gap: 0.2rem;
+  padding: clamp(0.8rem, 2vw, 1.6rem) 0 0.2rem;
+}
+.collage-gefuehle span {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(2.1rem, 6vw, 3.6rem);
+  line-height: 1.05;
+}
+@media (max-width: 699.98px) {
+  .collage-foto, .collage-foto.rechts { grid-column: 1 / -1; }
+}
+
+/* Antworten im Überblick */
+.antworten {
+  max-width: 62rem;
+  margin: 0 auto;
+  padding: clamp(1.8rem, 5vh, 3rem) clamp(1.1rem, 4vw, 3rem) 0.6rem;
+}
+.antworten h3 { font-size: 1.8rem; margin-bottom: 0.8rem; }
+.antwort-zeile {
+  display: grid;
+  grid-template-columns: minmax(10rem, 2fr) 3fr;
+  gap: 0.15rem 2rem;
+  padding: 0.85rem 0;
+  border-top: 1px solid var(--linie);
+}
+.antwort-frage { font-weight: 400; }
+.antwort-text { font-weight: 300; }
+/* Notiz wie die Antwort, nur gedämpft (Befund 24.09.) — keine kursive Serifenschrift mehr */
+.antwort-notiz {
+  margin-top: 0.2rem;
+  font-weight: 300;
+  color: var(--grau);
+}
+@media (max-width: 699.98px) {
+  .antwort-zeile { grid-template-columns: minmax(0, 1fr); gap: 0.15rem; }
+}
+
+/* Hinweise für Andrea */
+.hinweise {
+  max-width: 62rem;
+  margin: 0 auto;
+  padding: 1.7rem clamp(1.1rem, 4vw, 3rem);
+}
+.hinweise h3 { font-size: 1.8rem; margin-bottom: 0.8rem; }
+.hinweis {
+  border-left: 3px solid var(--gold);
+  padding: 0.5rem 0 0.5rem 1.1rem;
+  margin-bottom: 0.7rem;
+}
+.hinweise-leer { color: var(--grau); font-weight: 300; }
+
+/* Übergabe an die KI (im Muster nur angezeigt und kopierbar) */
+.ki {
+  max-width: 62rem;
+  margin: 0 auto;
+  padding: 1rem clamp(1.1rem, 4vw, 3rem) 0.4rem;
+}
+.ki h3 { font-size: 1.8rem; margin-bottom: 0.8rem; }
+.ki-text {
+  width: 100%;
+  min-height: 11rem;
+  font-size: 0.95rem;
+  font-weight: 300;
+  line-height: 1.5;
+  color: var(--tinte);
+  background: var(--zart);
+  border: 1px solid var(--linie-stark);
+  border-radius: 3px;
+  padding: 0.9rem 1rem;
+  resize: vertical;
+  white-space: pre-wrap;
+}
+.ki-text:focus { border-color: var(--gold); }
+.ki-zeile {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.9rem;
+  margin-top: 1rem;
+}
+.ki-hinweis {
+  color: var(--grau);
+  font-size: 0.95rem;
+}
+
+.aktion-leiste {
+  max-width: 62rem;
+  margin: 0 auto;
+  padding: 1.6rem clamp(1.1rem, 4vw, 3rem) 2.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+/* ---------- Bewegung nur auf Wunsch aus ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* ---------- Druckfassung: A4, ohne Knöpfe und KI-Bereich ---------- */
+
+@media print {
+  @page {
+    size: A4;
+    margin: 14mm 15mm;
+  }
+  body { font-size: 11.5pt; }
+  .druck-weg { display: none !important; }
+  .profil-kopf { padding: 0 0 5mm; }
+  .pinnwand {
+    border: 1px solid var(--linie);
+    padding: 6mm;
+  }
+  .antworten, .hinweise, .ki { padding: 5mm 0 0; }
+  .antwort-zeile, .collage-foto, .collage-band {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  img, .streifen, .streifen span {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
