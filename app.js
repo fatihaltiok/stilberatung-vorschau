@@ -63,6 +63,34 @@
     return null;
   }
 
+  function sichtbareFragen() {
+    var raumwahl = zustand.antworten.raum.gewaehlt;
+    return fragen.filter(function (frage) {
+      return !frage.raum || raumwahl.indexOf(frage.raum) >= 0 ||
+        (frage.raum === "ganze-wohnung" && raumwahl.length === 0);
+    });
+  }
+
+  function raumBezeichnung(raumId) {
+    return beschriftungZu(frageNachId("raum"), raumId);
+  }
+
+  /* Im Profil stehen alle gemeinsamen Fragen zuerst, danach die Raum-Teile. */
+  function profilGruppen(sichtbar) {
+    var gemeinsam = sichtbar.filter(function (frage) { return !frage.raum; });
+    var teile = [];
+    sichtbar.forEach(function (frage) {
+      if (!frage.raum) return;
+      var teil = teile.filter(function (eintrag) { return eintrag.raum === frage.raum; })[0];
+      if (!teil) {
+        teil = { raum: frage.raum, fragen: [] };
+        teile.push(teil);
+      }
+      teil.fragen.push(frage);
+    });
+    return { gemeinsam: gemeinsam, teile: teile };
+  }
+
   function beschriftungZu(frage, optionId) {
     for (var i = 0; i < frage.optionen.length; i++) {
       if (frage.optionen[i].id === optionId) return frage.optionen[i].label;
@@ -89,7 +117,7 @@
   /* ---------- Zustand ---------- */
 
   var zustand = {
-    schritt: -1, /* -1 Start, 0–11 Frage, 12 Profil */
+    schritt: -1, /* -1 Start, sonst Index in den sichtbaren Fragen */
     kunde: "",
     datum: deutschesDatum(new Date()),
     antworten: {}
@@ -138,7 +166,7 @@
       el("h1", { text: interview.titel }),
       el("p", {
         klasse: "start-intro",
-        text: "In zwölf kurzen Fragen finden wir gemeinsam heraus, wie Sie wohnen möchten — " +
+        text: "In wenigen kurzen Fragen finden wir gemeinsam heraus, wie Sie wohnen möchten — " +
               "alles lässt sich anklicken, eintippen oder einsprechen, und am Ende steht Ihr " +
               "Stilprofil für die Beratung."
       }),
@@ -169,7 +197,7 @@
       if (zustand.schritt > 0) { zustand.schritt--; zeigeFrage(); }
     });
     weiterKnopf.addEventListener("click", function () {
-      if (zustand.schritt >= fragen.length - 1) zeigeProfil();
+      if (zustand.schritt >= sichtbareFragen().length - 1) zeigeProfil();
       else { zustand.schritt++; zeigeFrage(); }
     });
 
@@ -192,7 +220,11 @@
     var titel = el("h2", {
       klasse: "frage-titel", tabindex: "-1", id: "frage-titel-" + frage.id, text: frage.frage
     });
-    var links = el("div", { klasse: "frage-links" }, titel);
+    var links = el("div", { klasse: "frage-links" });
+    if (frage.raum) links.appendChild(el("p", {
+      klasse: "raum-marke", testid: "raum-marke", text: raumBezeichnung(frage.raum)
+    }));
+    links.appendChild(titel);
     if (frage.hilfe) links.appendChild(el("p", { klasse: "frage-hilfe", text: frage.hilfe }));
 
     var ansicht = el("div", { klasse: "frage-ansicht" }, links);
@@ -415,42 +447,48 @@
 
   function zeigeFrage() {
     aufnahmeStoppen();
+    var sichtbar = sichtbareFragen();
+    var frage = sichtbar[zustand.schritt];
     startBereich.hidden = true;
     profilBereich.hidden = true;
     interviewBereich.hidden = false;
-    frageArtikel.forEach(function (artikel, index) {
-      artikel.hidden = index !== zustand.schritt;
+    frageArtikel.forEach(function (artikel) {
+      artikel.hidden = artikel.getAttribute("data-frage-id") !== frage.id;
     });
-    aktualisiereBildJe(fragen[zustand.schritt]);
-    fortschrittText.textContent = "Frage " + (zustand.schritt + 1) + " von " + fragen.length;
-    fortschrittBalken.style.width = ((zustand.schritt + 1) / fragen.length * 100) + "%";
+    aktualisiereBildJe(frage);
+    fortschrittText.textContent = "Frage " + (zustand.schritt + 1) + " von " + sichtbar.length;
+    fortschrittBalken.style.width = ((zustand.schritt + 1) / sichtbar.length * 100) + "%";
     zurueckKnopf.disabled = zustand.schritt === 0;
-    weiterKnopf.textContent = zustand.schritt === fragen.length - 1 ? "Stilprofil zeigen" : "Weiter";
-    var titel = frageArtikel[zustand.schritt].querySelector(".frage-titel");
+    weiterKnopf.textContent = zustand.schritt === sichtbar.length - 1 ? "Stilprofil zeigen" : "Weiter";
+    var titel = frageArtikel.filter(function (artikel) {
+      return artikel.getAttribute("data-frage-id") === frage.id;
+    })[0].querySelector(".frage-titel");
     if (titel) titel.focus();
   }
 
   /* ---------- Stilprofil ---------- */
 
-  function berechneHinweise() {
+  function berechneHinweise(sichtbar) {
     var raus = [];
+    var sichtbareIds = sichtbar.map(function (frage) { return frage.id; });
     interview.hinweise.forEach(function (regel) {
       var greift = regel.wenn.every(function (bedingung) {
-        var frage = frageNachId(bedingung.frage);
-        if (!frage) return false;
-        var gewaehlt = zustand.antworten[frage.id].gewaehlt;
-        return bedingung.enthaelt.some(function (optionId) {
-          return gewaehlt.indexOf(optionId) >= 0;
+        var ids = Array.isArray(bedingung.frage) ? bedingung.frage : [bedingung.frage];
+        return ids.some(function (id) {
+          if (sichtbareIds.indexOf(id) < 0) return false;
+          return bedingung.enthaelt.some(function (optionId) {
+            return zustand.antworten[id].gewaehlt.indexOf(optionId) >= 0;
+          });
         });
       });
-      if (greift) raus.push(regel.text);
+      if (greift && raus.indexOf(regel.text) < 0) raus.push(regel.text);
     });
     return raus;
   }
 
-  function baueProfiltext(kunde, antworten, hinweise) {
+  function baueProfiltext(kunde, antworten, hinweise, sichtbar) {
     var zeilen = [kunde ? "Stilprofil für " + kunde : "Stilprofil", "Datum: " + zustand.datum];
-    fragen.forEach(function (frage) {
+    function frageAnhaengen(frage) {
       var antwort = antworten[frage.id];
       var beschriftungen = antwort.gewaehlt.map(function (optionId) {
         return beschriftungZu(frage, optionId);
@@ -458,6 +496,12 @@
       zeilen.push("", frage.frage);
       zeilen.push("Antwort: " + (beschriftungen.length ? beschriftungen.join(", ") : "—"));
       if (antwort.notiz.trim()) zeilen.push("Notiz: " + antwort.notiz.trim());
+    }
+    var gruppen = profilGruppen(sichtbar);
+    gruppen.gemeinsam.forEach(frageAnhaengen);
+    gruppen.teile.forEach(function (teil) {
+      zeilen.push("", "Raum: " + raumBezeichnung(teil.raum));
+      teil.fragen.forEach(frageAnhaengen);
     });
     zeilen.push("");
     if (hinweise.length) {
@@ -475,11 +519,11 @@
     });
   }
 
-  function baueCollage() {
+  function baueCollage(sichtbar) {
     var fotos = [];
     var baender = [];
     var gefuehle = [];
-    fragen.forEach(function (frage) {
+    sichtbar.forEach(function (frage) {
       var gewaehlt = gewaehlteOptionen(frage);
       if (frage.typ === "bild") {
         gewaehlt.forEach(function (option) { fotos.push({ frage: frage, option: option }); });
@@ -517,9 +561,9 @@
     return collage;
   }
 
-  function baueAntwortenListe() {
+  function baueAntwortenListe(sichtbar) {
     var liste = document.createDocumentFragment();
-    fragen.forEach(function (frage) {
+    function frageAnhaengen(frage) {
       var antwort = zustand.antworten[frage.id];
       var beschriftungen = antwort.gewaehlt.map(function (optionId) {
         return beschriftungZu(frage, optionId);
@@ -532,6 +576,14 @@
       liste.appendChild(el("div", { klasse: "antwort-zeile" },
         el("p", { klasse: "antwort-frage", text: frage.frage }),
         haupt));
+    }
+    var gruppen = profilGruppen(sichtbar);
+    gruppen.gemeinsam.forEach(frageAnhaengen);
+    gruppen.teile.forEach(function (teil) {
+      liste.appendChild(el("h4", {
+        klasse: "profil-raum", testid: "profil-raum", text: raumBezeichnung(teil.raum)
+      }));
+      teil.fragen.forEach(frageAnhaengen);
     });
     return liste;
   }
@@ -539,10 +591,11 @@
   function zeigeProfil() {
     aufnahmeStoppen();
     var kunde = zustand.kunde.trim();
-    var hinweise = berechneHinweise();
+    var sichtbar = sichtbareFragen();
+    var hinweise = berechneHinweise(sichtbar);
 
     var antwortenKopie = {};
-    fragen.forEach(function (frage) {
+    sichtbar.forEach(function (frage) {
       antwortenKopie[frage.id] = {
         gewaehlt: zustand.antworten[frage.id].gewaehlt.slice(),
         notiz: zustand.antworten[frage.id].notiz
@@ -555,14 +608,14 @@
       hinweise: hinweise.slice()
     };
 
-    var profiltext = baueProfiltext(kunde, antwortenKopie, hinweise);
-    var kiText = interview.kiAuftrag.replace("{PROFIL}", profiltext);
+    var profiltext = baueProfiltext(kunde, antwortenKopie, hinweise, sichtbar);
+    var kiText = interview.kiAuftrag.replace("{PROFIL}", function () { return profiltext; }); /* Funktion: „$&“ im Freitext bleibt wörtlich (Befund B1) */
 
     /* Moodboard nur, wenn etwas gewählt ist — keine leeren Rahmen */
-    var fotosDa = fragen.some(function (frage) {
+    var fotosDa = sichtbar.some(function (frage) {
       return frage.typ === "bild" && gewaehlteOptionen(frage).length > 0;
     });
-    var baenderDa = fragen.some(function (frage) {
+    var baenderDa = sichtbar.some(function (frage) {
       return frage.typ === "farbe" && gewaehlteOptionen(frage).length > 0;
     });
     var gefuehleDa = gewaehlteOptionen(frageNachId("gefuehl")).length > 0;
@@ -579,7 +632,7 @@
             klasse: "handschrift", src: "bilder/handschrift.png", alt: "",
             width: "260", height: "62"
           }),
-          baueCollage())));
+          baueCollage(sichtbar))));
     }
 
     var hinweisBereich = el("section", { klasse: "hinweise" },
@@ -605,7 +658,7 @@
 
     profilBereich.appendChild(el("section", { klasse: "antworten" },
       el("h3", { text: "Ihre Antworten" }),
-      baueAntwortenListe()));
+      baueAntwortenListe(sichtbar)));
     profilBereich.appendChild(hinweisBereich);
     profilBereich.appendChild(el("section", { klasse: "ki druck-weg" },
       el("h3", { text: "Übergabe an die KI" }),
@@ -629,7 +682,7 @@
     });
     profilBereich.querySelector("[data-testid=neu]").addEventListener("click", allesNeu);
 
-    zustand.schritt = fragen.length;
+    zustand.schritt = sichtbar.length;
     startBereich.hidden = true;
     interviewBereich.hidden = true;
     profilBereich.hidden = false;

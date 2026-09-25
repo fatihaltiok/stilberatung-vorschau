@@ -255,6 +255,13 @@ textarea { font: inherit; }
   text-wrap: balance;
   margin-bottom: 0.6rem;
 }
+.raum-marke {
+  margin-bottom: 0.45rem;
+  color: #80633E;
+  font-family: var(--ohne);
+  font-size: 0.95rem;
+  font-weight: 500;
+}
 .frage-hilfe {
   color: var(--grau);
   font-weight: 300;
@@ -536,6 +543,15 @@ textarea { font: inherit; }
   padding: clamp(1.8rem, 5vh, 3rem) clamp(1.1rem, 4vw, 3rem) 0.6rem;
 }
 .antworten h3 { font-size: 1.8rem; margin-bottom: 0.8rem; }
+.profil-raum {
+  margin: 1.6rem 0 0.35rem;
+  color: #80633E;
+  font-family: var(--serif);
+  font-size: 1.55rem;
+  font-weight: 500;
+  line-height: 1.2;
+  break-after: avoid;
+}
 .antwort-zeile {
   display: grid;
   grid-template-columns: minmax(10rem, 2fr) 3fr;
