@@ -10,6 +10,10 @@
   var interview = window.INTERVIEW;
   var fragen = interview.fragen;
 
+  /* D.4 Punkt 2: Umschalter — kunde.html trägt data-fassung="kunde", index.html das Attribut nicht.
+   * Ohne Attribut (Andreas Fassung) bleibt alles wie bisher, Wort für Wort. */
+  var kundenFassung = document.documentElement.getAttribute("data-fassung") === "kunde";
+
   /* ---------- Helfer ---------- */
 
   function el(tag, attribute) {
@@ -158,7 +162,10 @@
       if (ereignis.key === "Enter") { ereignis.preventDefault(); gespraechBeginnen(); }
     });
 
-    var beginnen = el("button", { klasse: "knopf", testid: "start", type: "button", text: "Gespräch beginnen" });
+    var beginnen = el("button", {
+      klasse: "knopf", testid: "start", type: "button",
+      text: kundenFassung ? "Los geht’s" : "Gespräch beginnen"  /* D.4 Punkt 3 */
+    });
     beginnen.addEventListener("click", gespraechBeginnen);
 
     startBereich = el("section", { klasse: "start" },
@@ -166,16 +173,27 @@
       el("h1", { text: interview.titel }),
       el("p", {
         klasse: "start-intro",
-        text: "In wenigen kurzen Fragen finden wir gemeinsam heraus, wie Sie wohnen möchten — " +
-              "alles lässt sich anklicken, eintippen oder einsprechen, und am Ende steht Ihr " +
-              "Stilprofil für die Beratung."
+        text: kundenFassung
+          ? "In wenigen kurzen Fragen halten Sie fest, wie Sie wohnen möchten. " +
+            "Alles lässt sich anklicken, eintippen oder einsprechen. Am Ende steht Ihr Stilprofil."
+          : "In wenigen kurzen Fragen finden wir gemeinsam heraus, wie Sie wohnen möchten — " +
+            "alles lässt sich anklicken, eintippen oder einsprechen, und am Ende steht Ihr " +
+            "Stilprofil für die Beratung."
       }),
       el("div", { klasse: "start-formular" },
-        el("label", { klasse: "feld-label", for: "kunde-feld", text: "Für wen ist die Beratung?" }),
+        el("label", {
+          klasse: "feld-label", for: "kunde-feld",
+          text: kundenFassung ? "Ihr Name" : "Für wen ist die Beratung?"  /* D.4 Punkt 3 */
+        }),
         kundenFeld,
         el("p", { klasse: "start-datum", text: "Datum: " + zustand.datum }),
         el("div", { klasse: "start-aktion" }, beginnen),
-        el("p", { klasse: "start-hinweis", text: "Dieses Muster speichert nichts. Beim Schließen sind die Antworten weg." })
+        el("p", {
+          klasse: "start-hinweis",
+          text: kundenFassung
+            ? "Diese Seite speichert nichts. Beim Schließen sind die Antworten weg."  /* kein Wort „Muster“ (D.4 Punkt 3) */
+            : "Dieses Muster speichert nichts. Beim Schließen sind die Antworten weg."
+        })
       )
     );
     wurzel.appendChild(startBereich);
@@ -608,9 +626,6 @@
       hinweise: hinweise.slice()
     };
 
-    var profiltext = baueProfiltext(kunde, antwortenKopie, hinweise, sichtbar);
-    var kiText = interview.kiAuftrag.replace("{PROFIL}", function () { return profiltext; }); /* Funktion: „$&“ im Freitext bleibt wörtlich (Befund B1) */
-
     /* Moodboard nur, wenn etwas gewählt ist — keine leeren Rahmen */
     var fotosDa = sichtbar.some(function (frage) {
       return frage.typ === "bild" && gewaehlteOptionen(frage).length > 0;
@@ -635,47 +650,63 @@
           baueCollage(sichtbar))));
     }
 
-    var hinweisBereich = el("section", { klasse: "hinweise druck-weg" },  /* intern, nicht ins PDF für die Kundin (Andrea 01.10.) */
-      el("h3", { text: "Hinweise für Andrea" }));
-    if (hinweise.length) {
-      hinweise.forEach(function (text) {
-        hinweisBereich.appendChild(el("p", { klasse: "hinweis", testid: "hinweis", text: text }));
-      });
-    } else {
-      hinweisBereich.appendChild(el("p", {
-        klasse: "hinweise-leer", text: "Keine besonderen Hinweise aus diesen Antworten."
-      }));
-    }
-
-    kiFeld = el("textarea", {
-      klasse: "ki-text", testid: "ki-text", readonly: "readonly", rows: "12",
-      "aria-label": "Auftrag an die KI"
-    });
-    kiFeld.value = kiText;
-
-    var kopierenKnopf = el("button", { klasse: "knopf", testid: "kopieren", type: "button", text: "Text kopieren" });
-    kopierenKnopf.addEventListener("click", function () { textKopieren(kopierenKnopf); });
-
     profilBereich.appendChild(el("section", { klasse: "antworten" },
       el("h3", { text: "Ihre Antworten" }),
       baueAntwortenListe(sichtbar)));
-    profilBereich.appendChild(hinweisBereich);
-    profilBereich.appendChild(el("section", { klasse: "ki druck-weg" },
-      el("h3", { text: "Übergabe an die KI" }),
-      kiFeld,
-      el("div", { klasse: "ki-zeile" },
-        kopierenKnopf,
-        el("button", {
-          klasse: "knopf", testid: "ki-knopf", type: "button",
-          text: "Vorschläge von der KI holen", disabled: "disabled"
-        }),
-        el("p", {
-          klasse: "ki-hinweis",
-          text: "Kommt im nächsten Schritt: Hier schickt der Assistent das Profil an die KI."
-        }))));
+
+    /* Nur die Andreas-Fassung: interne Hinweise und KI-Übergabe.
+     * Kundenfassung (D.4 Punkt 5): beide Abschnitte werden gar nicht erzeugt —
+     * kein [data-testid=hinweis], keine .hinweise, kein .ki, kein ki-text/kopieren/ki-knopf. */
+    if (!kundenFassung) {
+      var hinweisBereich = el("section", { klasse: "hinweise druck-weg" },  /* intern, nicht ins PDF für die Kundin (Andrea 01.10.) */
+        el("h3", { text: "Hinweise für Andrea" }));
+      if (hinweise.length) {
+        hinweise.forEach(function (text) {
+          hinweisBereich.appendChild(el("p", { klasse: "hinweis", testid: "hinweis", text: text }));
+        });
+      } else {
+        hinweisBereich.appendChild(el("p", {
+          klasse: "hinweise-leer", text: "Keine besonderen Hinweise aus diesen Antworten."
+        }));
+      }
+
+      var profiltext = baueProfiltext(kunde, antwortenKopie, hinweise, sichtbar);
+      var kiText = interview.kiAuftrag.replace("{PROFIL}", function () { return profiltext; }); /* Funktion: „$&“ im Freitext bleibt wörtlich (Befund B1) */
+
+      kiFeld = el("textarea", {
+        klasse: "ki-text", testid: "ki-text", readonly: "readonly", rows: "12",
+        "aria-label": "Auftrag an die KI"
+      });
+      kiFeld.value = kiText;
+
+      var kopierenKnopf = el("button", { klasse: "knopf", testid: "kopieren", type: "button", text: "Text kopieren" });
+      kopierenKnopf.addEventListener("click", function () { textKopieren(kopierenKnopf); });
+
+      profilBereich.appendChild(hinweisBereich);
+      profilBereich.appendChild(el("section", { klasse: "ki druck-weg" },
+        el("h3", { text: "Übergabe an die KI" }),
+        kiFeld,
+        el("div", { klasse: "ki-zeile" },
+          kopierenKnopf,
+          el("button", {
+            klasse: "knopf", testid: "ki-knopf", type: "button",
+            text: "Vorschläge von der KI holen", disabled: "disabled"
+          }),
+          el("p", {
+            klasse: "ki-hinweis",
+            text: "Kommt im nächsten Schritt: Hier schickt der Assistent das Profil an die KI."
+          }))));
+    }
+
     profilBereich.appendChild(el("div", { klasse: "aktion-leiste druck-weg" },
-      el("button", { klasse: "knopf", testid: "drucken", type: "button", text: "Als PDF speichern" }),
-      el("button", { klasse: "textknopf", testid: "neu", type: "button", text: "Neues Gespräch" })));
+      el("button", {
+        klasse: "knopf", testid: "drucken", type: "button",
+        text: kundenFassung ? "PDF erstellen" : "Als PDF speichern"  /* D.4 Punkt 5 */
+      }),
+      el("button", {
+        klasse: "textknopf", testid: "neu", type: "button",
+        text: kundenFassung ? "Von vorn beginnen" : "Neues Gespräch"  /* D.4 Punkt 5 */
+      })));
 
     profilBereich.querySelector("[data-testid=drucken]").addEventListener("click", function () {
       window.print();

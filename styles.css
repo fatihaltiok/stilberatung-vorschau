@@ -657,6 +657,13 @@ textarea { font: inherit; }
     break-inside: avoid;
     page-break-inside: avoid;
   }
+  /* 01.10.: mit 7/5-Spalten und height:100% rutschten alle Fotos geschlossen auf Seite 2 (leerer Rahmen
+     auf Seite 1). Im Druck zwei gleiche Spalten, Höhe aus dem Seitenverhältnis. */
+  .collage { grid-template-columns: 1fr 1fr; }
+  .collage-foto, .collage-foto.rechts { grid-column: auto; }
+  .collage-foto.breit { grid-column: 1 / -1; }
+  .collage-foto img { height: auto; }
+  .antworten h3 { break-after: avoid; page-break-after: avoid; }
   img, .streifen, .streifen span {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
