@@ -635,7 +635,7 @@
           baueCollage(sichtbar))));
     }
 
-    var hinweisBereich = el("section", { klasse: "hinweise" },
+    var hinweisBereich = el("section", { klasse: "hinweise druck-weg" },  /* intern, nicht ins PDF für die Kundin (Andrea 01.10.) */
       el("h3", { text: "Hinweise für Andrea" }));
     if (hinweise.length) {
       hinweise.forEach(function (text) {
